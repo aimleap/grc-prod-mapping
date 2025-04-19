@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
 import pandas as pd
 import re
 from datetime import datetime
@@ -71,7 +77,7 @@ def getStoreBrand(storeBrandList,title,organiclist):
         status = "organic"
     else:
         status = "national brand"
-
+        
     return status
 
 def extract_weight_count(product):
@@ -84,17 +90,17 @@ def extract_weight_count(product):
 
     # Match count with optional space and variations of 'ct', 'Count', and 'Each'
     count_match = re.search(r'(\d+)?\s?(Count|ct|Each|each)', product, re.IGNORECASE)
-
+    
     if weight_match:
         weight = weight_match.group(0).strip()
-
+    
     if count_match:
         count_num = count_match.group(1)
         if count_num:
             count = count_num.strip() + ' Count'
         else:
             count = '1 Each'
-
+    
     return weight, count
 def getStoreBrand(storeBrandList,title,organiclist):
     temptitle = title.replace("Simple Truth Organic","")
@@ -106,7 +112,7 @@ def getStoreBrand(storeBrandList,title,organiclist):
         status = "organic"
     else:
         status = "national brand"
-
+        
     return status
 def cleanWeights(weight):
     weight = weight.lower().replace(" ",'').replace("ct",'count').replace("ounce",'oz')
@@ -118,7 +124,7 @@ def getAvailableString(cateList,testString):
     newList = []
     for spacesInCha in  multipleSpacesList:
         singleLetterAvailableList = [i for i in spacesInCha.split(" ") if i in availableCat2]
-        [availableCat2.remove(i) for i in singleLetterAvailableList if i in availableCat2]
+        [availableCat2.remove(i) for i in singleLetterAvailableList if i in availableCat2] 
     #########################
     ExactMatchavailableCat2 = []
     singleLetterAvailableList = [i for i in availableCat2 if len(i.split(" ")) == 1]
@@ -130,7 +136,7 @@ def getAvailableString(cateList,testString):
 
 def getAimleapTitle(testString):
     testString = testString.lower().replace(","," ").replace("!",' ').replace("("," ").replace(")",' ').replace("."," ").replace('"',' ').strip()
-
+    
     if "potatoes" in testString:
         testString = testString.replace("potatoes","potato")
     if "tomatoes" in testString:
@@ -139,7 +145,7 @@ def getAimleapTitle(testString):
         testString = testString.replace("strawberries","strawberry")
     if "oinions" in testString:
         testString = testString.replace("oinions","onions")
-
+        
     cate1 = getAvailableString(cate1List,testString)
     cate2 = getAvailableString(cate2List,testString)
     cate3 = getAvailableString(cate3List,testString)
@@ -147,11 +153,11 @@ def getAimleapTitle(testString):
     form1 = getAvailableString(forms,testString)
 
     label1_ = getAvailableString(labels1,testString)
-
+    
     label2_ = getAvailableString(labels2,testString)
     with_ = getAvailableString(withList,testString)
     pack = getAvailableString(PackList,testString)
-
+    
     aimleapTitleList = []
     aimleapTitleList.append(cate1)
     if cate2 not in aimleapTitleList:
@@ -162,7 +168,7 @@ def getAimleapTitle(testString):
         aimleapTitleList.append(cate4)
     if form1 not in aimleapTitleList:
         aimleapTitleList.append(form1)
-
+        
     if label1_ not in aimleapTitleList:
         aimleapTitleList.append(label1_)
     if label1_ not in aimleapTitleList:
@@ -181,7 +187,7 @@ def getAimleapTitle(testString):
         newTitle.remove("and")
     if "each" in newTitle:
         newTitle.remove("each")
-
+        
     if "with" in newTitle:
         newTitle.remove("with")
     newTitle.sort()
@@ -256,7 +262,7 @@ def getUpcs(str_):
         return "".join(["0" for i in range(13-len(x))])+x+"^"
     else:
         return x +"^"
-
+    
 def getCleannationalBrand(nationalBrand):
     nationalBrandgrupd1 = nationalBrand.groupby("NewTitle").aggregate(lambda x: ' | '.join(set(map(str, x)))).reset_index()
     nationalBrandgrupd1 = nationalBrandgrupd1[nationalBrandgrupd1['aimleapId']!='']
@@ -268,7 +274,7 @@ def getCleannationalBrand(nationalBrand):
     nationalBrandgrupd1['spaceInNewTitle'] = nationalBrandgrupd1['NewTitle'].apply(lambda x:"yes" if " " in x else "no")
     nationalBrandgrupd1 = nationalBrandgrupd1[nationalBrandgrupd1['spaceInNewTitle'] == 'yes']
     del nationalBrandgrupd1['spaceInNewTitle']
-    nationalBrandgrupd = nationalBrandgrupd1[['NewTitle','product_title','url','stdUPC','brandStatus']]
+    nationalBrandgrupd = nationalBrandgrupd1[['NewTitle','product_title','url','stdUPC','brandStatus','aimleapTitlewithsource']]
 
     nationalBrandgrupd['tempurl'] = nationalBrandgrupd['url'].apply(lambda x:getUrls(x))
     nationalBrandgrupd['jewel_url'] = nationalBrandgrupd['tempurl'].apply(lambda x:x[0])
@@ -298,7 +304,7 @@ def getCleanstoreBrand(storeBrand):
     storeBrandgrupd1['spaceInNewTitle'] = storeBrandgrupd1['NewTitle'].apply(lambda x:"yes" if " " in x else "no")
     storeBrandgrupd1 = storeBrandgrupd1[storeBrandgrupd1['spaceInNewTitle'] == 'yes']
     del storeBrandgrupd1['spaceInNewTitle']
-    storeBrandgrupd = storeBrandgrupd1[['NewTitle','product_title','url','stdUPC','brandStatus']]
+    storeBrandgrupd = storeBrandgrupd1[['NewTitle','product_title','url','stdUPC','brandStatus','aimleapTitlewithsource']]
 
     storeBrandgrupd['tempurl'] = storeBrandgrupd['url'].apply(lambda x:getUrls(x))
 
@@ -330,7 +336,7 @@ def getCleanOrganic(organic):
     organicgrupd1['spaceInNewTitle'] = organicgrupd1['NewTitle'].apply(lambda x:"yes" if " " in x else "no")
     organicgrupd1 = organicgrupd1[organicgrupd1['spaceInNewTitle'] == 'yes']
     del organicgrupd1['spaceInNewTitle']
-    organicgrupd = organicgrupd1[['NewTitle','product_title','url','stdUPC','brandStatus']]
+    organicgrupd = organicgrupd1[['NewTitle','product_title','url','stdUPC','brandStatus','aimleapTitlewithsource']]
 
     organicgrupd['tempurl'] = organicgrupd['url'].apply(lambda x:getUrls(x))
     organicgrupd['jewel_url'] = organicgrupd['tempurl'].apply(lambda x:x[0])
@@ -350,135 +356,155 @@ def getCleanOrganic(organic):
     return organicgrupd
 
 
+#store brand selection 
+marianos = ["Private Selection", "Kroger", "Simple Truth"]
+# marianos = ["Private Selection", "Kroger", "Simple Truth", "Simple Truth Organic"]
+Target = ["Deal Worthy", "Good & Gather", "Market Pantry", "Favorite Day", "Kindfull", "Smartly", "Up & Up"]
+# Jewel =  ['Lucerne', "Signature Select", "O Organics", "Open Nature", "Waterfront Bistro", "Primo Taglio",
+#           "Soleil", "Value Corner", "Ready Meals"]
+Jewel =  ['Lucerne', "Signature Select", "Open Nature", "Waterfront Bistro", "Primo Taglio",
+          "Soleil", "Value Corner", "Ready Meals"]
+Walmart = ["Clear American", "Great Value", "Home Bake Value", "Marketside", 
+           "Co Squared", "Best Occasions", "Mash-Up Coffee", "World Table"]
 
-def main():
-    #store brand selection
-    marianos = ["Private Selection", "Kroger", "Simple Truth"]
-    # marianos = ["Private Selection", "Kroger", "Simple Truth", "Simple Truth Organic"]
-    Target = ["Deal Worthy", "Good & Gather", "Market Pantry", "Favorite Day", "Kindfull", "Smartly", "Up & Up"]
-    # Jewel =  ['Lucerne', "Signature Select", "O Organics", "Open Nature", "Waterfront Bistro", "Primo Taglio",
-    #           "Soleil", "Value Corner", "Ready Meals"]
-    Jewel =  ['Lucerne', "Signature Select", "Open Nature", "Waterfront Bistro", "Primo Taglio",
-              "Soleil", "Value Corner", "Ready Meals"]
-    Walmart = ["Clear American", "Great Value", "Home Bake Value", "Marketside",
-               "Co Squared", "Best Occasions", "Mash-Up Coffee", "World Table"]
+organiclist = ["Simple Truth Organic", "O Organics"]
+storeBrandList = []
+[storeBrandList.append(i) for i in marianos]
+[storeBrandList.append(i) for i in Target]
+[storeBrandList.append(i) for i in Jewel]
+[storeBrandList.append(i) for i in Walmart]
+#curation input file
+curationFile = "PASS CURATION FILE"
 
-    organiclist = ["Simple Truth Organic", "O Organics"]
-    storeBrandList = []
-    [storeBrandList.append(i) for i in marianos]
-    [storeBrandList.append(i) for i in Target]
-    [storeBrandList.append(i) for i in Jewel]
-    [storeBrandList.append(i) for i in Walmart]
-    #curation input file
-    curationFile = "PASS CURATION FILE"
+variationsDf = pd.read_excel(curationFile)
+variationsDf = variationsDf.fillna("")
 
-    variationsDf = pd.read_excel(curationFile)
-    variationsDf = variationsDf.fillna("")
+cate1List = variationsDf['cat1'].unique()
+cate2List = variationsDf['cat2'].unique()
+cate3List = variationsDf['cat3'].unique()
+cate4List = variationsDf['cat4'].unique()
 
-    cate1List = variationsDf['cat1'].unique()
-    cate2List = variationsDf['cat2'].unique()
-    cate3List = variationsDf['cat3'].unique()
-    cate4List = variationsDf['cat4'].unique()
+labels1 = variationsDf['label1'].unique()
+labels2 = variationsDf['label2'].unique()
+form1 = list(variationsDf['form1'].unique())
+form2 = list(variationsDf['form2'].unique())
+form3 = list(variationsDf['form3'].unique())
 
-    labels1 = variationsDf['label1'].unique()
-    labels2 = variationsDf['label2'].unique()
-    form1 = list(variationsDf['form1'].unique())
-    form2 = list(variationsDf['form2'].unique())
-    form3 = list(variationsDf['form3'].unique())
+[form1.append(i) for i in form2]
+[form1.append(i) for i in form3]
+forms = list(set(form1))
 
-    [form1.append(i) for i in form2]
-    [form1.append(i) for i in form3]
-    forms = list(set(form1))
-
-    forms = [i.lower().strip() for i in forms if i!='']
-    cate1List = [i.lower().strip() for i in cate1List if i!='']
-    cate2List = [i.lower().strip() for i in cate2List if i!='']
-    cate3List = [i.lower().strip() for i in cate3List if i!='']
-    cate4List = [i.lower().strip() for i in cate4List if i!='']
-    labels1 = [i.lower().strip() for i in labels1 if i!='']
-    labels2 = [i.lower().strip() for i in labels2 if i!='']
+forms = [i.lower().strip() for i in forms if i!='']
+cate1List = [i.lower().strip() for i in cate1List if i!='']
+cate2List = [i.lower().strip() for i in cate2List if i!='']
+cate3List = [i.lower().strip() for i in cate3List if i!='']
+cate4List = [i.lower().strip() for i in cate4List if i!='']
+labels1 = [i.lower().strip() for i in labels1 if i!='']
+labels2 = [i.lower().strip() for i in labels2 if i!='']
 
 
-    withList = variationsDf['with'].unique()
-    # FlavorList = variationsDf['Flavor'].unique()
-    PackList = variationsDf['Pack'].unique()
-    withList = [i.lower().strip() for i in withList if i!='']
-    # FlavorList = [i.lower().strip() for i in FlavorList if i!='']
-    PackList = [i.lower().strip() for i in PackList if i!='']
+withList = variationsDf['with'].unique()
+# FlavorList = variationsDf['Flavor'].unique()
+PackList = variationsDf['Pack'].unique()
+withList = [i.lower().strip() for i in withList if i!='']
+# FlavorList = [i.lower().strip() for i in FlavorList if i!='']
+PackList = [i.lower().strip() for i in PackList if i!='']
 
 
-    inputFile = "PASS_HERE_OUTPUT_FILE .json"
-    combinedDf = pd.read_json(inputFile)
-    combinedDf = combinedDf.fillna("")
-    produceDf = selectCategories(combinedDf)
-    produceDf = produceDf.reset_index(drop=True)
-    produceDf = produceDf.drop_duplicates(keep='first')
-    produceDf['product_title_weight'] = produceDf['product_title'] + " "+produceDf['weight']
-    produceDf[['Weight_', 'Count_']] = produceDf['product_title_weight'].apply(lambda x: pd.Series(extract_weight_count(x)))
-    produceDf['brandStatus'] = produceDf['product_title'].apply(lambda x:getStoreBrand(storeBrandList,x,organiclist))
-    produceDf['aimleapTitle'] = produceDf['product_title'].apply(lambda x:getAimleapTitle(x.lower()))
-    produceDf['Weight_'] = produceDf['Weight_'].apply(lambda x:x.lower().replace(" ",'').strip())
-    produceDf['Count_'] = produceDf['Count_'].apply(lambda x:x.lower().replace("1 count",'1 each').strip())
-    produceDf['Count_'] = produceDf['Count_'].apply(lambda x:x.replace("1 each",''))
-    produceDf['aimleapTitle'] = produceDf['aimleapTitle']+" "+produceDf['Weight_']+" "+produceDf['Count_']
-    produceDf['aimleapTitle'] = produceDf['aimleapTitle'].apply(lambda x:x.strip())
-    produceDf['aimleapTitle'] = produceDf['aimleapTitle'].apply(lambda x:x.strip())
-    produceDf['aimleapTitle'] = produceDf['aimleapTitle'].apply(lambda x:getNewStr(x))
-    produceDf['aimleapTitle'] = produceDf['aimleapTitle'].apply(lambda x:cleanTitle(x).replace(" package",'').replace('|package',''))
-    produceDf = produceDf.rename(columns={"aimleapTitle":"NewTitle"})
-    produceDf = produceDf.reset_index(drop=True)
-    NewTitles = produceDf['NewTitle'].unique()
-    aimleapIds = ["Aimleap"+str(i) for i in range(len(NewTitles))]
-    aimleapIdsdf = pd.DataFrame(aimleapIds,columns=['aimleapId'])
-    NewTitlesdf = pd.DataFrame(NewTitles,columns=['title'])
-    NewTitlesdf['aimleapId'] = aimleapIdsdf['aimleapId']
-    produceDf['aimleapId'] = produceDf['NewTitle'].apply(lambda x:getAimleapId(x))
-    produceDf['source'] = produceDf['url'].apply(lambda x:x.split("/")[2])
-    produceDf['source'] = produceDf['source'].apply(lambda x:x.split(".")[1])
-    produceDf['newUpc'] = produceDf.apply(lambda x:x['source'][0]+str(x['upc']),axis=1)
-
-    nationalBrand = produceDf[produceDf['brandStatus']=='national brand']
-    storeBrand = produceDf[produceDf['brandStatus']=='store brand']
-    organic = produceDf[produceDf['brandStatus']=='organic']
-
-    nationalBrandgrupd = getCleannationalBrand(nationalBrand)
-    storeBrandgrupd = getCleanstoreBrand(storeBrand)
-    organicgrupd = getCleanOrganic(organic)
-
-    storeBrandgrupd = storeBrandgrupd.append(nationalBrandgrupd)
-    storeBrandgrupd = storeBrandgrupd.append(organicgrupd)
-    storeBrandgrupd = storeBrandgrupd.reset_index(drop=True)
-    del storeBrandgrupd['NewTitle']
-    storeNotMapped = storeNotMapped.append(nationalNotMapped)
-    storeNotMapped = storeNotMapped.append(organicNotMapped)
-    storeBrandgrupd['jewel_url'] = storeBrandgrupd['jewel_url'].apply(lambda x:x.replace("|","\n"))
-    storeBrandgrupd['marianos_url'] = storeBrandgrupd['marianos_url'].apply(lambda x:x.replace("|","\n"))
-    storeBrandgrupd['target_url'] = storeBrandgrupd['target_url'].apply(lambda x:x.replace("|","\n"))
-    storeBrandgrupd['walmart_url'] = storeBrandgrupd['walmart_url'].apply(lambda x:x.replace("|","\n"))
-    # Slno
-    ids = [i+1 for i in range(len(storeBrandgrupd))]
-    ids = pd.DataFrame(ids,columns=['Sl.No'])
-    storeBrandgrupd['Sl.No'] = ids['Sl.No']
-    storeBrandgrupd = storeBrandgrupd[['Sl.No','product_title', 'brandStatus', 'jewel_url', 'marianos_url',
-           'target_url', 'walmart_url', 'UPC']]
-
-    # with pd.ExcelWriter("classification_produce_"+str(datetime.now().date())+".xlsx",engine='xlsxwriter',options={"strings_to_urls":False}) as writer:
-    #     storeBrandgrupd.to_excel(writer,index=False)
-    storeBrandgrupd['jewel_urlCount'] = storeBrandgrupd['jewel_url'].apply(lambda x:0 if x=='' else 1)
-    storeBrandgrupd['marianos_urlCount'] = storeBrandgrupd['marianos_url'].apply(lambda x:0 if x=='' else 1)
-    storeBrandgrupd['target_urlCount'] = storeBrandgrupd['target_url'].apply(lambda x:0 if x=='' else 1)
-    storeBrandgrupd['walmart_urlCount'] = storeBrandgrupd['walmart_url'].apply(lambda x:0 if x=='' else 1)
-    storeBrandgrupd['count'] = storeBrandgrupd['jewel_urlCount']+storeBrandgrupd['marianos_urlCount']+storeBrandgrupd['target_urlCount']+storeBrandgrupd['walmart_urlCount']
-    storeBrandgrupd = storeBrandgrupd[storeBrandgrupd['count']>=2]
-    storeBrandgrupd = storeBrandgrupd.reset_index(drop=True)
-    storeBrandgrupd = storeBrandgrupd[['Sl.No', 'product_title', 'brandStatus', 'jewel_url', 'marianos_url','target_url', 'walmart_url', 'UPC']]
-    # Slno
-    ids = [i+1 for i in range(len(storeBrandgrupd))]
-    ids = pd.DataFrame(ids,columns=['Sl.No'])
-    storeBrandgrupd['Sl.No'] = ids['Sl.No']
-    with pd.ExcelWriter("classification_produce_"+str(datetime.now().date())+".xlsx",engine='xlsxwriter',options={"strings_to_urls":False}) as writer:
-        storeBrandgrupd.to_excel(writer,index=False)
+inputFile = "PASS_HERE_OUTPUT_FILE .json"
+combinedDf = pd.read_json(inputFile)
+combinedDf = combinedDf.fillna("")
+produceDf = selectCategories(combinedDf)
+produceDf = produceDf.reset_index(drop=True)
+produceDf = produceDf.drop_duplicates(keep='first')
+produceDf['product_title_weight'] = produceDf['product_title'] + " "+produceDf['weight']
+produceDf[['Weight_', 'Count_']] = produceDf['product_title_weight'].apply(lambda x: pd.Series(extract_weight_count(x)))
+produceDf['brandStatus'] = produceDf['product_title'].apply(lambda x:getStoreBrand(storeBrandList,x,organiclist))
+produceDf['aimleapTitle'] = produceDf['product_title'].apply(lambda x:getAimleapTitle(x.lower()))
+produceDf['Weight_'] = produceDf['Weight_'].apply(lambda x:x.lower().replace(" ",'').strip())
+produceDf['Count_'] = produceDf['Count_'].apply(lambda x:x.lower().replace("1 count",'1 each').strip())
+produceDf['Count_'] = produceDf['Count_'].apply(lambda x:x.replace("1 each",''))
+produceDf['aimleapTitle'] = produceDf['aimleapTitle']+" "+produceDf['Weight_']+" "+produceDf['Count_']
+produceDf['aimleapTitle'] = produceDf['aimleapTitle'].apply(lambda x:x.strip())
+produceDf['aimleapTitle'] = produceDf['aimleapTitle'].apply(lambda x:x.strip())
+produceDf['aimleapTitle'] = produceDf['aimleapTitle'].apply(lambda x:getNewStr(x))
+produceDf['aimleapTitle'] = produceDf['aimleapTitle'].apply(lambda x:cleanTitle(x).replace(" package",'').replace('|package',''))
+produceDf = produceDf.rename(columns={"aimleapTitle":"NewTitle"})
+produceDf = produceDf.reset_index(drop=True)
+NewTitles = produceDf['NewTitle'].unique()
+aimleapIds = ["Aimleap"+str(i) for i in range(len(NewTitles))]
+aimleapIdsdf = pd.DataFrame(aimleapIds,columns=['aimleapId'])
+NewTitlesdf = pd.DataFrame(NewTitles,columns=['title'])
+NewTitlesdf['aimleapId'] = aimleapIdsdf['aimleapId']
+produceDf['aimleapId'] = produceDf['NewTitle'].apply(lambda x:getAimleapId(x))
+produceDf['source'] = produceDf['url'].apply(lambda x:x.split("/")[2])
+produceDf['source'] = produceDf['source'].apply(lambda x:x.split(".")[1])
+produceDf['newUpc'] = produceDf.apply(lambda x:x['source'][0]+str(x['upc']),axis=1)
+produceDf['aimleapTitlewithsource'] = produceDf['product_title'] +" + "+ produceDf['source']
 
 
-if __name__ == '__main__':
-    main()
+nationalBrand = produceDf[produceDf['brandStatus']=='national brand']
+storeBrand = produceDf[produceDf['brandStatus']=='store brand']
+organic = produceDf[produceDf['brandStatus']=='organic']
+
+nationalBrandgrupd = getCleannationalBrand(nationalBrand)
+storeBrandgrupd = getCleanstoreBrand(storeBrand)
+organicgrupd = getCleanOrganic(organic)
+
+storeBrandgrupd = storeBrandgrupd.append(nationalBrandgrupd)
+storeBrandgrupd = storeBrandgrupd.append(organicgrupd)
+storeBrandgrupd = storeBrandgrupd.reset_index(drop=True)
+del storeBrandgrupd['NewTitle']
+storeNotMapped = storeNotMapped.append(nationalNotMapped)
+storeNotMapped = storeNotMapped.append(organicNotMapped)
+storeBrandgrupd['jewel_url'] = storeBrandgrupd['jewel_url'].apply(lambda x:x.replace("|","\n"))
+storeBrandgrupd['marianos_url'] = storeBrandgrupd['marianos_url'].apply(lambda x:x.replace("|","\n"))
+storeBrandgrupd['target_url'] = storeBrandgrupd['target_url'].apply(lambda x:x.replace("|","\n"))
+storeBrandgrupd['walmart_url'] = storeBrandgrupd['walmart_url'].apply(lambda x:x.replace("|","\n"))
+# Slno
+ids = [i+1 for i in range(len(storeBrandgrupd))]
+ids = pd.DataFrame(ids,columns=['Sl.No'])
+storeBrandgrupd['Sl.No'] = ids['Sl.No']
+storeBrandgrupd = storeBrandgrupd[['Sl.No','product_title', 'brandStatus', 'jewel_url', 'marianos_url',
+       'target_url', 'walmart_url', 'UPC','aimleapTitlewithsource']]
+
+# with pd.ExcelWriter("classification_produce_"+str(datetime.now().date())+".xlsx",engine='xlsxwriter',options={"strings_to_urls":False}) as writer:
+#     storeBrandgrupd.to_excel(writer,index=False)
+storeBrandgrupd['jewel_urlCount'] = storeBrandgrupd['jewel_url'].apply(lambda x:0 if x=='' else 1)
+storeBrandgrupd['marianos_urlCount'] = storeBrandgrupd['marianos_url'].apply(lambda x:0 if x=='' else 1)
+storeBrandgrupd['target_urlCount'] = storeBrandgrupd['target_url'].apply(lambda x:0 if x=='' else 1)
+storeBrandgrupd['walmart_urlCount'] = storeBrandgrupd['walmart_url'].apply(lambda x:0 if x=='' else 1)
+storeBrandgrupd['count'] = storeBrandgrupd['jewel_urlCount']+storeBrandgrupd['marianos_urlCount']+storeBrandgrupd['target_urlCount']+storeBrandgrupd['walmart_urlCount']
+storeBrandgrupd = storeBrandgrupd[storeBrandgrupd['count']>=2]
+storeBrandgrupd = storeBrandgrupd.reset_index(drop=True)
+storeBrandgrupd = storeBrandgrupd[['Sl.No', 'product_title', 'brandStatus', 'jewel_url', 'marianos_url','target_url', 'walmart_url', 'UPC','aimleapTitlewithsource']]
+# Slno
+ids = [i+1 for i in range(len(storeBrandgrupd))]
+ids = pd.DataFrame(ids,columns=['Sl.No'])
+storeBrandgrupd['Sl.No'] = ids['Sl.No']
+
+storeBrandgrupd = storeBrandgrupd[['Sl.No', 'product_title', 'brandStatus', 'jewel_url', 'marianos_url','target_url', 'walmart_url', 'UPC']]
+with pd.ExcelWriter("classification_produce_"+str(datetime.now().date())+".xlsx",engine='xlsxwriter',options={"strings_to_urls":False}) as writer:
+    storeBrandgrupd.to_excel(writer,index=False)
+    
+def getSourceWiseProducts(testString):
+    testStringList = testString.split("|")
+    marianosProducts = "|".join([i.replace("+ marianos",'').strip() for i in testStringList if "marianos" in i])
+    jeweloscoProducts = "|".join([i.replace("+ jewelosco",'').strip() for i in testStringList if "jewelosco" in i])
+    targetProducts = "|".join([i.replace("+ target",'').strip() for i in testStringList if "target" in i])
+    walmartProducts = "|".join([i.replace("+ walmart",'').strip() for i in testStringList if "walmart" in i])
+    return marianosProducts, jeweloscoProducts, targetProducts,walmartProducts
+
+
+storeBrandgrupd['aimleapTitlewithsourceSET'] = storeBrandgrupd['aimleapTitlewithsource'].apply(lambda x:getSourceWiseProducts(x))
+storeBrandgrupd['Mariano Product'] = storeBrandgrupd['aimleapTitlewithsourceSET'].apply(lambda x:x[0])
+storeBrandgrupd['Jewelosco Product'] = storeBrandgrupd['aimleapTitlewithsourceSET'].apply(lambda x:x[1])
+storeBrandgrupd['Target Product'] = storeBrandgrupd['aimleapTitlewithsourceSET'].apply(lambda x:x[2])
+storeBrandgrupd['Walmart Product'] = storeBrandgrupd['aimleapTitlewithsourceSET'].apply(lambda x:x[3])
+storeBrandgrupd['Common UPC'] = storeBrandgrupd['UPC']
+productMtchingDf = storeBrandgrupd[['Common UPC','Walmart Product','Target Product','Mariano Product','Jewelosco Product']]
+
+    
+with pd.ExcelWriter("produceProductMatching_"+str(datetime.now().date())+".xlsx",engine='xlsxwriter',options={"strings_to_urls":False}) as writer:
+    productMtchingDf.to_excel(writer,index=False)
+
